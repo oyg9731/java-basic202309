@@ -3,11 +3,11 @@ package day01;
 import java.util.Arrays;
 
 public class ArrayDelete {
+
     public static void main(String[] args) {
+
         int[] arr = {1, 3, 5, 7, 9, 11};
         int deleteTargetIndex = 2;
-
-        for (int i = deleteTargetIndex; i < arr.length - 1; i++)
 
         arr[2] = arr[3];
         arr[3] = arr[4];
@@ -19,6 +19,7 @@ public class ArrayDelete {
         }
         arr = temp; temp = null;
 
-        System.out.println("arr = " + Arrays.toString(arr));
+        System.out.println("arr: " + Arrays.toString(arr));
     }
 }
+
