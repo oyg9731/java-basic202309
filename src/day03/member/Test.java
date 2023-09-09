@@ -9,5 +9,20 @@ public class Test {
         mr.addMember(thief);
 
         mr.showMembers();
+
+        System.out.println("=========================");
+
+        String email = "fff@ggg.com";
+        boolean flag1 = mr.isDuplicatedEmail(email);
+        System.out.println("flag1 = " + flag1);
+
+        Member foundMember = mr.findMemberByEmail(email);
+        System.out.println("foundMember.inform() = " + foundMember.inform());
+
+        mr.deleteMember(email);
+        mr.deleteMember("xxx@vvv.com");
+
+        mr.showMembers();
+        mr.printRemoveMembers();
     }
 }
