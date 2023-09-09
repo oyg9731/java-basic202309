@@ -22,12 +22,13 @@ public class MemberView {
      */
     void mainView() {
         System.out.println("\n##### 회원 관리 시스템 #####");
-        if(mr.getNumberOfMembers() < MAX_REGISTER)System.out.println("* 1. 회원 정보 등록하기");
+        if (mr.getNumberOfMembers() < MAX_REGISTER) System.out.println("* 1. 회원 정보 등록하기");
         System.out.println("* 2. 개별회원 정보 조회하기");
         System.out.println("* 3. 전체회원 정보 조회하기");
         System.out.println("* 4. 회원 정보 수정하기");
         System.out.println("* 5. 회원 정보 삭제하기");
-        System.out.println("* 6. 프로그램 끝내기");
+        if (mr.getNumberOfMembers() < MAX_REGISTER) System.out.println("* 6. 회원 정보 복구하기");
+        System.out.println("* 7. 프로그램 끝내기");
         System.out.println("=============================");
     }
 
@@ -41,14 +42,14 @@ public class MemberView {
 
             switch (menuNum) {
                 case "1":
-                    if (mr.getNumberOfMembers() > MAX_REGISTER - 1){
+                    if (mr.getNumberOfMembers() > MAX_REGISTER - 1) {
                         System.out.println("# 더 이상 회원등록을 할 수 없습니다.");
                         continue;
                     }
                     signUp();
                     break;
                 case "2":
-                    information();
+                    showDetail();
                     break;
                 case "3":
                     mr.showMembers();
@@ -56,10 +57,18 @@ public class MemberView {
                     break;
                 case "4":
                     changePassword();
+                    break;
                 case "5":
                     deleteMemberProcess();
                     break;
                 case "6":
+                    if (mr.getNumberOfMembers() > MAX_REGISTER - 1) {
+                        System.out.println("# 회원목록이 꽉차서 현재 복구가 불가능합니다.");
+                        continue;
+                    }
+                    restoreMember();
+                    break;
+                case "7":
                     String answer = input("# 정말로 종료합니까? [y/n] : ");
                     if (answer.toLowerCase().charAt(0) == 'y') {
                         System.out.println("# 프로그램을 종료합니다.");
@@ -74,39 +83,69 @@ public class MemberView {
         }
     }
 
-    private void deleteMemberProcess() {
+    private void restoreMember() {
         // 이메일을 입력받음
-        String email = input("# 삭제 대상의 이메일: ");
-        // 삭제 대상 탐색
-        Member member = mr.findMemberByEmail(email);
+        String email = input("# 복구 대상의 이메일: ");
+
+        // 복구 대상 탐색
+        Member member = mr.findMemberByEmail(email, true);
+
         if (member != null) {
             // 패스워드 검사
             String inputPw = input("# 비밀번호: ");
-            if (mr.isMatchPassword(inputPw, member.password)){
-                mr.deleteMember(email);
-                System.out.println("\n# 회원 탈퇴가 처리되었습니다. 복구하시려면 복구메뉴를 이용하세여");
-            }else{
 
+            if (mr.isMatchPassword(inputPw, member.password)) {
+                mr.deleteMember(email, true);
+                System.out.println("\n# 회원 복구가 처리되었습니다.");
+            } else {
+                System.out.println("\n# 비밀번호가 일치하지 않습니다.");
             }
-        }else {
+
+        } else {
             System.out.println("\n# 조회 결과가 없습니다.");
         }
         stop();
     }
 
-    private void information() {
+    private void deleteMemberProcess() {
         // 이메일을 입력받음
-        String email = input("# 검색 대상의 이메일: ");
-        // 검색 대상 탐색
-        Member member = mr.findMemberByEmail(email);
+        String email = input("# 삭제 대상의 이메일: ");
 
+        // 삭제 대상 탐색
+        Member member = mr.findMemberByEmail(email, false);
+
+        if (member != null) {
+            // 패스워드 검사
+            String inputPw = input("# 비밀번호: ");
+
+            if (mr.isMatchPassword(inputPw, member.password)) {
+                mr.deleteMember(email, false);
+                System.out.println("\n# 회원 탈퇴가 처리되었습니다. 복구하시려면 복구메뉴를 이용하세요.");
+            } else {
+                System.out.println("\n# 비밀번호가 일치하지 않습니다.");
+            }
+
+        } else {
+            System.out.println("\n# 조회 결과가 없습니다.");
+        }
+        stop();
+    }
+
+    private void showDetail() {
+        // 이메일을 입력받음
+        String email = input("# 조회 대상의 이메일: ");
+
+        // 조회 대상 탐색
+        Member member = mr.findMemberByEmail(email, false);
+
+        // 회원이 탐색됨
         if (member != null) {
             // 탐색된 회원의 정보를 출력
             member.showDetailInfo();
-        }else {
-                System.out.println("\n# 조회 결과가 없습니다.");
-            }
-            stop();
+        } else {
+            System.out.println("\n# 조회 결과가 없습니다.");
+        }
+        stop();
     }
 
     private void changePassword() {
@@ -114,21 +153,22 @@ public class MemberView {
         String email = input("# 수정 대상의 이메일: ");
 
         // 수정 대상 탐색
-        Member member = mr.findMemberByEmail(email);
+        Member member = mr.findMemberByEmail(email, false);
 
         // 회원이 탐색됨
-        if (member != null){
-            System.out.printf("#%s님의 비밀번호를 변경합니다.\n", member.memberName);
+        if (member != null) {
+            System.out.printf("# %s님의 비밀번호를 변경합니다.\n", member.memberName);
             String newPassword = input("# 새로운 비밀번호: ");
 
             // 만약 새비번이 기존비번과 같은경우 pass
-            if (member.password.equals(newPassword)){
+            if (member.password.equals(newPassword)) {
                 System.out.println("# 기존 비밀번호와 동일합니다. 변경을 취소합니다.");
+                stop();
                 return;
             }
             mr.updatePassword(newPassword, email);
             System.out.println("# 비밀번호 변경이 완료되었습니다.");
-        }else {
+        } else {
             System.out.println("\n# 조회 결과가 없습니다.");
         }
         stop();
