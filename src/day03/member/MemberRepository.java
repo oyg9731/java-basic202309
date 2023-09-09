@@ -130,10 +130,11 @@ public class MemberRepository {
     int getNumberOfMembers() {
         return memberList.length;
     }
-    /*
-    * 패스워드 일치검증 메서드
-    * */
-    boolean isMatchPassword(String inputPassword, String originPassword){
-        return inputPassword
+
+    /**
+     * 패스워드 일치검증 메서드
+     */
+    boolean isMatchPassword(String inputPassword, String originPassword) {
+        return inputPassword.equals(originPassword);
     }
 }
