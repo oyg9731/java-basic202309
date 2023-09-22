@@ -12,7 +12,7 @@ public class StringList {
     int size(){
         return sArr.length;
     }
-    void push(String newData){
+    public void push(String newData){
         String[] temp = new String[sArr.length + 1];
         for (int i = 0; i < sArr.length; i++) {
             temp[i] = sArr[i];
@@ -75,4 +75,7 @@ public class StringList {
         sArr = temp;
     }
 
+    public String[] getsArr() {
+        return sArr;
+    }
 }

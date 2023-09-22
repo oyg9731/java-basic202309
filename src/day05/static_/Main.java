@@ -24,7 +24,7 @@ public class Main {
         out.println("c1.y = " + c1.y); // 50
 
         makeLine();
-        input("이름 : ");
+//        input("이름 : ");
 
         random();
 
